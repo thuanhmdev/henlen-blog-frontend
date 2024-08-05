@@ -1,19 +1,18 @@
+import { LayoutDashboard, LogOut, NotepadTextDashed } from "lucide-react";
 import React from "react";
-import { LuLogOut } from "react-icons/lu";
-import { MdOutlineDashboard, MdOutlineDocumentScanner } from "react-icons/md";
 
 const Sidebar = () => {
   const menuItems = [
     {
       id: "dashboard",
       title: "Dashboard",
-      icon: MdOutlineDashboard,
+      icon: LayoutDashboard,
       url: "/admin/dashboard",
     },
     {
       id: "blog",
       title: "Blog",
-      icon: MdOutlineDocumentScanner,
+      icon: NotepadTextDashed,
       url: "/admin/blog",
     },
   ];
@@ -36,7 +35,7 @@ const Sidebar = () => {
         </div>
       </div>
       <div className="p-2 flex items-center">
-        <LuLogOut className="text-xl" />
+        <LogOut className="text-xl" />
         <span className="ms-3 md:text-sm lg:text-base font-semibold">
           Logout
         </span>

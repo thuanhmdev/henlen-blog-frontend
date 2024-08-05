@@ -4,19 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { ErrorMessage } from "@hookform/error-message";
-import { apiPost } from "@/api/api";
-import { TResponse } from "@/types/response";
-import { TResponseUserLogin } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { sendRequest } from "@/http/http";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 const LoginForm = () => {
   const router = useRouter();
-
   const formSchema = z.object({
-    email: z.string().min(1, { message: "This field is required" }).email({
-      message: "Email invalidate",
-    }),
+    username: z.string().min(1, { message: "This field is required" }),
     password: z.string().min(1, { message: "This field is required" }),
   });
 
@@ -29,19 +25,22 @@ const LoginForm = () => {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { statusCode, data, message, error } = await apiPost<
-      TResponse<TResponseUserLogin>
-    >("/api/v1/admin/auth/login", values);
-    if (statusCode <= 299) {
-      localStorage.setItem("access_token", data.accessToken);
-      router.push("/admin/dashboard", { scroll: false });
+    const res = await signIn("credentials", {
+      ...values,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      toast.success(res.error);
+      return;
     }
+    router.push("/");
   };
   return (
     <>
@@ -52,26 +51,26 @@ const LoginForm = () => {
       >
         <div>
           <label htmlFor="title" className="font-bold block">
-            Email
+            Username
           </label>
 
           <Controller
             render={({ field }) => (
               <input
-                type="email"
+                type="text"
                 className="w-full rounded-lg px-3 py-2 border-2 border-gray-300 hover:border-gray-400 outline-1 outline-gray-400 transition-all duration-200 ease-in-out"
-                placeholder="Email"
+                placeholder="Username"
                 formNoValidate
                 autoFocus
                 {...field}
               />
             )}
-            name="email"
+            name="username"
             control={control}
           />
           <ErrorMessage
             errors={errors}
-            name="email"
+            name="username"
             render={({ message }) => (
               <p className="text-red-500 text-sm">{message}</p>
             )}

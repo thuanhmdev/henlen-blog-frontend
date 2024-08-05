@@ -1,9 +1,15 @@
 import Image from "next/image";
 import LoginForm from "./login-form";
-import { cookies } from "next/headers";
-const AdminLogin = () => {
-  const cookieStore = cookies();
-  console.log(cookieStore);
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/auth.option";
+import { use } from "react";
+import { redirect } from "next/navigation";
+
+const AdminLogin = async () => {
+  const session = await getServerSession(authOptions);
+  if (session && session.user.typeRole === "ADMIN") {
+    redirect("/admin/blog");
+  }
   return (
     <>
       <div className="bg-sky-100 h-screen w-screen ">
